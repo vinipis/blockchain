@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/gob"
+	"encoding/hex"
 	"fmt"
+	"log"
 )
 
 type Transaction struct {
@@ -45,6 +47,38 @@ func CoinBaseTx(to, data string) *Transaction {
 	txout := TxOutput{100, to}
 	tx := Transaction{nil, []TxInput{txin}, []TxOutput{txout}}
 
+	tx.SetId()
+
+	return &tx
+}
+
+func NewTransaction(from string, to string, amount int, chain *Block) *Transaction {
+	var inputs []TxInput
+	var outputs []TxOutput
+
+	acc, validOutputs := chain.FindSpendableOutputs(from, amount)
+
+	if acc > amount {
+		log.Panic("Error: Not enough funds...")
+	}
+
+	for txid, outs := range validOutputs {
+		txID, err := hex.DecodeString(txid)
+		Handle(err)
+
+		for _, out := range outs {
+			input := TxInput{txID, out, from}
+			inputs = append(inputs, input)
+		}
+	}
+
+	outputs = append(outputs, TxOutput{amount, to})
+
+	if acc > amount {
+		outputs = append(outputs, TxOutput{acc - amount, from})
+	}
+
+	tx := Transaction{nil, inputs, outputs}
 	tx.SetId()
 
 	return &tx
