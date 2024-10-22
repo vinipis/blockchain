@@ -1,1 +1,3 @@
-/blockchain-golang/tmp/*
+/**/tmp/*
+/**/**/*pycache*/
+__pycache__/
