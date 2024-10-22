@@ -93,7 +93,7 @@ func (cli *CommandLine) run() {
 	sendAmount := sendCmd.Int("amount", 0, "amount to send")
 
 	switch os.Args[1] {
-	case "getBalance":
+	case "getbalance":
 		err := getBalanceCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
@@ -105,6 +105,11 @@ func (cli *CommandLine) run() {
 		}
 	case "printchain":
 		err := printChainCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "send":
+		err := sendCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
